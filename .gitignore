@@ -1,0 +1,48 @@
+# Python/FastAPI
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.env
+.env.*
+db.sqlite3
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+/frontend/build/
+
+# Web/Node (if any used)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Android-specific
+**/*.iml
+**/*.gradle
+**/local.properties
+**/GeneratedPluginRegistrant.java
+
+# iOS-specific
+.DS_Store
+**/docsets
+**/Pods
+**/DerivedData
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
