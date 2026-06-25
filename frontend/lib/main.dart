@@ -4,6 +4,7 @@ import 'theme/colors.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
+import 'screens/main_layout.dart';
 
 void main() {
   runApp(const VibeCutApp());
@@ -64,6 +65,7 @@ class VibeCutApp extends StatelessWidget {
         '/welcome': (context) => const WelcomeScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
+        '/home': (context) => const MainLayout(),
       },
     );
   }

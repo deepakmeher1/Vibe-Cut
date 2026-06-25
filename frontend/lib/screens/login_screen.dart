@@ -35,8 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
         
-        // Navigation placeholder (we will redirect to home screen in later phase)
-        Navigator.popUntil(context, ModalRoute.withName('/welcome'));
+        // Redirect to VibeCut Home Dashboard
+        Navigator.pushReplacementNamed(context, '/home');
       });
     }
   }
