@@ -2,29 +2,40 @@
 
 This is the mobile application frontend for the VibeCut app, built with Flutter for iOS and Android.
 
+## UI Screens Created (Phase 2)
+We have designed and structured the initial user onboarding and authentication flows inside the `lib/` directory:
+- `lib/theme/colors.dart`: Contains the premium AMOLED dark design tokens.
+- `lib/screens/welcome_screen.dart`: Onboarding landing screen with premium styling and animations.
+- `lib/screens/login_screen.dart`: User login validation and credential inputs.
+- `lib/screens/signup_screen.dart`: Register validation and inputs.
+
 ## Setup Instructions
 
 ### Prerequisites
-- [Flutter SDK installed](https://docs.flutter.dev/get-started/install/windows/mobile?tab=download) and added to your system PATH.
-- Android Studio or VS Code with Flutter and Dart extensions.
-- Git.
+1. [Flutter SDK installed](https://docs.flutter.dev/get-started/install/windows/mobile?tab=download) and added to your system PATH.
+2. Android Studio or VS Code with Flutter and Dart extensions.
 
-### 1. Initialize the Flutter Project
-Since Flutter SDK was not installed initially on this machine, you can initialize the project structure by navigating to the `E:\Deepak\D project\vibecut` directory and running:
+### 1. Generate Native Platform Files
+Since this project already contains our premium Dart code and custom `pubspec.yaml`, you need to generate the native platform configurations (Android, iOS, Web, etc.).
 
+Navigate to the `frontend` folder in your terminal and run:
 ```bash
-flutter create --org com.deepak.vibecut --project-name frontend frontend
+cd "E:\Deepak\D project\vibecut\frontend"
+flutter create --org com.deepak.vibecut .
 ```
 
-This will generate the complete native Flutter project structure (including `ios`, `android`, and `lib` folders) directly inside the `frontend/` directory.
+*Note: If `flutter create` overwrites `lib/main.dart` or `pubspec.yaml` with default templates, you can easily restore them from Git by running:*
+```bash
+git checkout -- pubspec.yaml lib/
+```
 
 ### 2. Run the Application
-1. Connect a real device (with USB debugging enabled) or start an emulator.
-2. Navigate to the `frontend` folder:
+1. Connect a physical Android/iOS device or launch an emulator.
+2. In the `frontend` directory, fetch dependencies:
    ```bash
-   cd frontend
+   flutter pub get
    ```
-3. Run the app:
+3. Start the application:
    ```bash
    flutter run
    ```
