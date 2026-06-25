@@ -18,20 +18,26 @@ class VibeCutApp extends StatelessWidget {
     return MaterialApp(
       title: 'VibeCut',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.dark,
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
+      themeMode: ThemeMode.light,
+      theme: ThemeData(
+        brightness: Brightness.light,
         scaffoldBackgroundColor: VibeCutColors.background,
         primaryColor: VibeCutColors.primary,
         hintColor: VibeCutColors.secondary,
-        colorScheme: const ColorScheme.dark(
+        colorScheme: const ColorScheme.light(
           primary: VibeCutColors.primary,
           secondary: VibeCutColors.secondary,
           surface: VibeCutColors.surface,
           error: VibeCutColors.error,
         ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: VibeCutColors.background,
+          foregroundColor: VibeCutColors.textPrimary,
+          elevation: 0,
+          iconTheme: IconThemeData(color: VibeCutColors.textPrimary),
+        ),
         textTheme: GoogleFonts.outfitTextTheme(
-          ThemeData.dark().textTheme,
+          ThemeData.light().textTheme,
         ).apply(
           bodyColor: VibeCutColors.textPrimary,
           displayColor: VibeCutColors.textPrimary,

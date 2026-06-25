@@ -14,7 +14,7 @@ class WelcomeScreen extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Background ambient glow circles
+            // Ambient light glow circles (Very soft pastel tones for light mode)
             Positioned(
               top: -100,
               right: -100,
@@ -23,8 +23,8 @@ class WelcomeScreen extends StatelessWidget {
                 height: 300,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: VibeCutColors.primary.withOpacity(0.15),
-                  blurRadius: 100,
+                  color: VibeCutColors.primary.withOpacity(0.08),
+                  blurRadius: 90,
                 ),
               ),
             ),
@@ -36,8 +36,8 @@ class WelcomeScreen extends StatelessWidget {
                 height: 350,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: VibeCutColors.secondary.withOpacity(0.15),
-                  blurRadius: 120,
+                  color: VibeCutColors.secondary.withOpacity(0.06),
+                  blurRadius: 100,
                 ),
               ),
             ),
@@ -61,9 +61,9 @@ class WelcomeScreen extends StatelessWidget {
                           gradient: VibeCutColors.primaryGradient,
                           boxShadow: [
                             BoxShadow(
-                              color: VibeCutColors.primary.withOpacity(0.4),
-                              blurRadius: 24,
-                              offset: const Offset(0, 8),
+                              color: VibeCutColors.primary.withOpacity(0.25),
+                              blurRadius: 20,
+                              offset: const Offset(0, 6),
                             )
                           ],
                         ),
@@ -76,20 +76,15 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 32),
                     
-                    // App Name
+                    // App Name (Light mode title)
                     Center(
-                      child: ShaderMask(
-                        shaderCallback: (bounds) => VibeCutColors.neonGradient.createShader(
-                          Rect.fromLTWH(0, 0, bounds.width, bounds.height),
-                        ),
-                        child: Text(
-                          'VibeCut',
-                          style: GoogleFonts.outfit(
-                            fontSize: 48,
-                            fontWeight: FontWeight.extrabold,
-                            color: Colors.white,
-                            letterSpacing: -1,
-                          ),
+                      child: Text(
+                        'VibeCut',
+                        style: GoogleFonts.outfit(
+                          fontSize: 48,
+                          fontWeight: FontWeight.extrabold,
+                          color: VibeCutColors.textPrimary,
+                          letterSpacing: -1,
                         ),
                       ),
                     ),
@@ -98,7 +93,7 @@ class WelcomeScreen extends StatelessWidget {
                     // Subtitle
                     Text(
                       'Elevate your edits, define your vibe.\nPremium cross-platform video editor.',
-                      textAlign: Center,
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
                         fontSize: 16,
                         color: VibeCutColors.textSecondary,
@@ -109,10 +104,9 @@ class WelcomeScreen extends StatelessWidget {
                     
                     const Spacer(),
                     
-                    // Create New Project Trigger
+                    // Create New Project Button
                     ElevatedButton(
                       onPressed: () {
-                        // Redirect to login/signup for new projects (base version requirement)
                         Navigator.pushNamed(context, '/login');
                       },
                       style: ElevatedButton.styleFrom(
@@ -131,8 +125,8 @@ class WelcomeScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: VibeCutColors.primary.withOpacity(0.3),
-                              blurRadius: 12,
+                              color: VibeCutColors.primary.withOpacity(0.2),
+                              blurRadius: 10,
                               offset: const Offset(0, 4),
                             )
                           ]
@@ -171,7 +165,7 @@ class WelcomeScreen extends StatelessWidget {
                           child: Text(
                             'Log In',
                             style: GoogleFonts.outfit(
-                              color: VibeCutColors.secondary,
+                              color: VibeCutColors.primary,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),

@@ -38,7 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         );
 
-        // Redirect to Login page after successful signup
+        // Redirect to Login page
         Navigator.pushReplacementNamed(context, '/login');
       });
     }
@@ -56,11 +56,12 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: VibeCutColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: VibeCutColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -80,7 +81,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: GoogleFonts.outfit(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: VibeCutColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -99,14 +100,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: GoogleFonts.outfit(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: VibeCutColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _nameController,
                   keyboardType: TextInputType.name,
-                  style: GoogleFonts.outfit(color: Colors.white),
+                  style: GoogleFonts.outfit(color: VibeCutColors.textPrimary),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your name';
@@ -126,14 +127,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: GoogleFonts.outfit(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: VibeCutColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: GoogleFonts.outfit(color: Colors.white),
+                  style: GoogleFonts.outfit(color: VibeCutColors.textPrimary),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -156,14 +157,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: GoogleFonts.outfit(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: VibeCutColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  style: GoogleFonts.outfit(color: Colors.white),
+                  style: GoogleFonts.outfit(color: VibeCutColors.textPrimary),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a password';
@@ -197,14 +198,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: GoogleFonts.outfit(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: VibeCutColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
-                  style: GoogleFonts.outfit(color: Colors.white),
+                  style: GoogleFonts.outfit(color: VibeCutColors.textPrimary),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please confirm your password';
@@ -294,7 +295,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Text(
                         'Log In',
                         style: GoogleFonts.outfit(
-                          color: VibeCutColors.secondary,
+                          color: VibeCutColors.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),

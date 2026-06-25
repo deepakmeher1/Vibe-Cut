@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
         
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Logged in successfully! (Placeholder)'),
+            content: Text('Logged in successfully!'),
             backgroundColor: VibeCutColors.success,
           ),
         );
@@ -51,11 +51,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: VibeCutColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: VibeCutColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -75,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: GoogleFonts.outfit(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: VibeCutColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -94,14 +95,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: GoogleFonts.outfit(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: VibeCutColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: GoogleFonts.outfit(color: Colors.white),
+                  style: GoogleFonts.outfit(color: VibeCutColors.textPrimary),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -127,18 +128,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: GoogleFonts.outfit(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                        color: VibeCutColors.textPrimary,
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {
-                        // Forgot password logic placeholder
-                      },
+                      onTap: () {},
                       child: Text(
                         'Forgot?',
                         style: GoogleFonts.outfit(
                           fontSize: 13,
-                          color: VibeCutColors.secondary,
+                          color: VibeCutColors.primary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -149,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  style: GoogleFonts.outfit(color: Colors.white),
+                  style: GoogleFonts.outfit(color: VibeCutColors.textPrimary),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
@@ -239,7 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         'Sign Up',
                         style: GoogleFonts.outfit(
-                          color: VibeCutColors.secondary,
+                          color: VibeCutColors.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),

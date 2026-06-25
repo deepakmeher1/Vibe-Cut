@@ -46,39 +46,30 @@ class _MainLayoutState extends State<MainLayout> {
       backgroundColor: VibeCutColors.background,
       appBar: _currentTabIndex == 0 
           ? AppBar(
-              backgroundColor: Colors.transparent,
+              backgroundColor: VibeCutColors.background,
               elevation: 0,
-              title: Row(
-                children: [
-                  ShaderMask(
-                    shaderCallback: (bounds) => VibeCutColors.neonGradient.createShader(
-                      Rect.fromLTWH(0, 0, bounds.width, bounds.height),
-                    ),
-                    child: Text(
-                      'VibeCut',
-                      style: GoogleFonts.outfit(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
+              title: Text(
+                'VibeCut',
+                style: GoogleFonts.outfit(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: VibeCutColors.textPrimary,
+                ),
               ),
               centerTitle: false,
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                  icon: const Icon(Icons.notifications_outlined, color: VibeCutColors.textPrimary),
                   onPressed: () {},
                 ),
                 IconButton(
-                  icon: const Icon(Icons.settings_outlined, color: Colors.white),
+                  icon: const Icon(Icons.settings_outlined, color: VibeCutColors.textPrimary),
                   onPressed: () {},
                 ),
                 const SizedBox(width: 8),
               ],
             )
-          : null, // Sub-pages will manage their own headers
+          : null,
       body: SafeArea(
         child: IndexedStack(
           index: _currentTabIndex,
@@ -96,29 +87,29 @@ class _MainLayoutState extends State<MainLayout> {
           onTap: _changeTab,
           type: BottomNavigationBarType.fixed,
           backgroundColor: VibeCutColors.background,
-          selectedItemColor: VibeCutColors.secondary,
+          selectedItemColor: VibeCutColors.textPrimary,
           unselectedItemColor: VibeCutColors.textSecondary,
           selectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 11),
           unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w500, fontSize: 11),
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.cut_outlined),
-              activeIcon: Icon(Icons.cut, color: VibeCutColors.secondary),
+              activeIcon: Icon(Icons.cut, color: VibeCutColors.textPrimary),
               label: 'Edit',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.movie_filter_outlined),
-              activeIcon: Icon(Icons.movie_filter, color: VibeCutColors.secondary),
+              activeIcon: Icon(Icons.movie_filter, color: VibeCutColors.textPrimary),
               label: 'Templates',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.folder_open_outlined),
-              activeIcon: Icon(Icons.folder, color: VibeCutColors.secondary),
+              activeIcon: Icon(Icons.folder, color: VibeCutColors.textPrimary),
               label: 'Projects',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline_rounded),
-              activeIcon: Icon(Icons.person_rounded, color: VibeCutColors.secondary),
+              activeIcon: Icon(Icons.person_rounded, color: VibeCutColors.textPrimary),
               label: 'Me',
             ),
           ],

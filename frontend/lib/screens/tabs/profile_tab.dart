@@ -25,7 +25,7 @@ class ProfileTab extends StatelessWidget {
                   border: Border.all(color: VibeCutColors.primary, width: 1.5),
                 ),
                 child: const Center(
-                  child: Icon(Icons.person, size: 36, color: VibeCutColors.secondary),
+                  child: Icon(Icons.person, size: 36, color: VibeCutColors.primary),
                 ),
               ),
               const SizedBox(width: 16),
@@ -39,7 +39,7 @@ class ProfileTab extends StatelessWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: VibeCutColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -96,7 +96,7 @@ class ProfileTab extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
             child: Row(
               children: [
-                Icon(icon, size: 24, color: Colors.white),
+                Icon(icon, size: 24, color: VibeCutColors.textPrimary),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
@@ -104,7 +104,7 @@ class ProfileTab extends StatelessWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      color: VibeCutColors.textPrimary,
                     ),
                   ),
                 ),
@@ -127,14 +127,14 @@ class ProfileTab extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
           child: Row(
             children: [
-              Icon(icon, size: 24, color: color ?? Colors.white),
+              Icon(icon, size: 24, color: color ?? VibeCutColors.textPrimary),
               const SizedBox(width: 16),
               Text(
                 label,
                 style: GoogleFonts.outfit(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: color ?? Colors.white,
+                  color: color ?? VibeCutColors.textPrimary,
                 ),
               ),
             ],

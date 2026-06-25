@@ -22,7 +22,7 @@ class TemplatesTab extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextField(
-                    style: GoogleFonts.outfit(color: Colors.white),
+                    style: GoogleFonts.outfit(color: VibeCutColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: 'Search templates, creators...',
                       hintStyle: GoogleFonts.outfit(color: VibeCutColors.textSecondary.withOpacity(0.5)),
@@ -45,7 +45,7 @@ class TemplatesTab extends StatelessWidget {
                   color: VibeCutColors.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.movie_creation_outlined, color: VibeCutColors.secondary),
+                child: const Icon(Icons.movie_creation_outlined, color: VibeCutColors.primary),
               ),
             ],
           ),
@@ -128,12 +128,8 @@ class TemplatesTab extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isActive ? VibeCutColors.primary.withOpacity(0.2) : VibeCutColors.surface,
+        color: isActive ? VibeCutColors.primary : VibeCutColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isActive ? VibeCutColors.primary : Colors.transparent,
-          width: 1,
-        ),
       ),
       child: Text(
         label,
@@ -196,14 +192,14 @@ class TemplatesTab extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
-                      color: VibeCutColors.secondary,
+                      color: VibeCutColors.primary,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       'AI',
                       style: GoogleFonts.outfit(
                         fontSize: 9, 
-                        color: VibeCutColors.background, 
+                        color: Colors.white, 
                         fontWeight: FontWeight.bold
                       ),
                     ),
@@ -222,7 +218,7 @@ class TemplatesTab extends StatelessWidget {
           style: GoogleFonts.outfit(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: VibeCutColors.textPrimary,
           ),
         ),
         const SizedBox(height: 4),
@@ -232,10 +228,10 @@ class TemplatesTab extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 8,
-              backgroundColor: VibeCutColors.primary.withOpacity(0.3),
+              backgroundColor: VibeCutColors.primary.withOpacity(0.2),
               child: Text(
                 author[0], 
-                style: const TextStyle(fontSize: 8, color: Colors.white),
+                style: const TextStyle(fontSize: 8, color: VibeCutColors.primary),
               ),
             ),
             const SizedBox(width: 6),

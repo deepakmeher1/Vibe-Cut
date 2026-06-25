@@ -19,13 +19,13 @@ class EditTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Promotional Header Banner
+          // 1. Promotional Header Banner (Image overlay, text remains white for contrast)
           Container(
             height: 220,
             width: double.infinity,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=600&auto=format&fit=crop'), // Placeholder visual for music/dj vibes
+                image: NetworkImage('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=600&auto=format&fit=crop'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -33,9 +33,9 @@ class EditTab extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    VibeCutColors.background.withOpacity(0.9),
+                    Colors.black.withOpacity(0.5),
                     Colors.transparent,
-                    VibeCutColors.background.withOpacity(0.95),
+                    Colors.black.withOpacity(0.7),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -49,7 +49,7 @@ class EditTab extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: VibeCutColors.secondary,
+                      color: VibeCutColors.primary,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -57,7 +57,7 @@ class EditTab extends StatelessWidget {
                       style: GoogleFonts.outfit(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: VibeCutColors.background,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -66,7 +66,7 @@ class EditTab extends StatelessWidget {
                     'Fast style, spend less',
                     style: GoogleFonts.outfit(
                       fontSize: 16,
-                      color: VibeCutColors.textSecondary,
+                      color: Colors.white70,
                     ),
                   ),
                   Text(
@@ -84,15 +84,13 @@ class EditTab extends StatelessWidget {
           
           // 2. Central Action Cards (+ New Video & Edit Photo)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
             child: Row(
               children: [
-                // New Video Button (Gradient)
+                // New Video Button (Cyan Gradient)
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
-                      // Navigate to project template/draft creation in later phases
-                    },
+                    onTap: () {},
                     child: Container(
                       height: 120,
                       decoration: BoxDecoration(
@@ -100,8 +98,8 @@ class EditTab extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: VibeCutColors.primary.withOpacity(0.3),
-                            blurRadius: 10,
+                            color: VibeCutColors.primary.withOpacity(0.25),
+                            blurRadius: 12,
                             offset: const Offset(0, 4),
                           )
                         ],
@@ -126,7 +124,7 @@ class EditTab extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
                 
-                // Edit Photo Button (Card surface)
+                // Edit Photo Button (Card surface / White background)
                 Expanded(
                   child: GestureDetector(
                     onTap: () {},
@@ -135,19 +133,18 @@ class EditTab extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: VibeCutColors.surface,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: VibeCutColors.textMuted.withOpacity(0.3), width: 1),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.photo_library_outlined, size: 36, color: VibeCutColors.secondary),
+                          const Icon(Icons.photo_library_outlined, size: 36, color: VibeCutColors.textPrimary),
                           const SizedBox(height: 8),
                           Text(
                             'Edit photo',
                             style: GoogleFonts.outfit(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: VibeCutColors.textPrimary,
                             ),
                           ),
                         ],
@@ -159,7 +156,7 @@ class EditTab extends StatelessWidget {
             ),
           ),
 
-          // 3. Quick Action Grid (Horizontal scrollable or small Grid)
+          // 3. Quick Action Grid (White background / light gray containers)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Container(
@@ -186,7 +183,7 @@ class EditTab extends StatelessWidget {
                   _buildQuickActionItem(
                     Icons.grid_view_rounded, 
                     'All tools', 
-                    color: VibeCutColors.secondary,
+                    color: VibeCutColors.primary,
                     onTap: onOpenAllTools
                   ),
                 ],
@@ -194,9 +191,9 @@ class EditTab extends StatelessWidget {
             ),
           ),
 
-          // 4. Projects Section
+          // 4. Projects Section Header
           Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -205,7 +202,7 @@ class EditTab extends StatelessWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: VibeCutColors.textPrimary,
                   ),
                 ),
                 TextButton(
@@ -215,7 +212,7 @@ class EditTab extends StatelessWidget {
                   child: Text(
                     'View all',
                     style: GoogleFonts.outfit(
-                      color: VibeCutColors.secondary,
+                      color: VibeCutColors.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -224,7 +221,7 @@ class EditTab extends StatelessWidget {
             ),
           ),
           
-          // Projects List (Mock data matching screenshot 2/5)
+          // Projects List (Light Mode list items)
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -267,7 +264,7 @@ class EditTab extends StatelessWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: VibeCutColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -320,11 +317,11 @@ class EditTab extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: VibeCutColors.background,
+              color: Colors.white,
               shape: BoxShape.circle,
-              border: Border.all(color: VibeCutColors.textMuted.withOpacity(0.2), width: 1),
+              border: Border.all(color: VibeCutColors.textMuted, width: 1),
             ),
-            child: Icon(icon, size: 22, color: color ?? Colors.white),
+            child: Icon(icon, size: 22, color: color ?? VibeCutColors.textPrimary),
           ),
           const SizedBox(height: 6),
           Text(

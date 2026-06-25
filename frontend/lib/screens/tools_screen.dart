@@ -17,14 +17,14 @@ class ToolsScreen extends StatelessWidget {
           style: GoogleFonts.outfit(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: VibeCutColors.textPrimary,
           ),
         ),
         centerTitle: false,
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white, size: 28),
+            icon: const Icon(Icons.close, color: VibeCutColors.textPrimary, size: 28),
             onPressed: () => Navigator.pop(context),
           ),
           const SizedBox(width: 8),
@@ -97,7 +97,7 @@ class ToolsScreen extends StatelessWidget {
             ),
           ),
           
-          // 4. Floating bottom gradient button "+ New project"
+          // 4. Floating bottom gradient button "+ New project" (Screenshot 3)
           Positioned(
             bottom: 20,
             left: 16,
@@ -129,7 +129,7 @@ class ToolsScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: VibeCutColors.primary.withOpacity(0.3),
+                      color: VibeCutColors.primary.withOpacity(0.25),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     )
@@ -168,7 +168,7 @@ class ToolsScreen extends StatelessWidget {
       style: GoogleFonts.outfit(
         fontSize: 17,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: VibeCutColors.textPrimary,
       ),
     );
   }
@@ -186,9 +186,9 @@ class ToolsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: VibeCutColors.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: VibeCutColors.textMuted.withOpacity(0.15), width: 1),
+                border: Border.all(color: VibeCutColors.textMuted.withOpacity(0.5), width: 0.5),
               ),
-              child: Icon(icon, size: 26, color: Colors.white),
+              child: Icon(icon, size: 26, color: VibeCutColors.textPrimary),
             ),
             
             // Pro/Free Badge

@@ -31,21 +31,21 @@ class _ProjectsTabState extends State<ProjectsTab> {
                     style: GoogleFonts.outfit(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: VibeCutColors.textPrimary,
                     ),
                   ),
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.search, color: Colors.white),
+                        icon: const Icon(Icons.search, color: VibeCutColors.textPrimary),
                         onPressed: () {},
                       ),
                       IconButton(
-                        icon: const Icon(Icons.sort_rounded, color: Colors.white),
+                        icon: const Icon(Icons.sort_rounded, color: VibeCutColors.textPrimary),
                         onPressed: () {},
                       ),
                       IconButton(
-                        icon: const Icon(Icons.more_horiz, color: Colors.white),
+                        icon: const Icon(Icons.more_horiz, color: VibeCutColors.textPrimary),
                         onPressed: () {},
                       ),
                     ],
@@ -54,7 +54,7 @@ class _ProjectsTabState extends State<ProjectsTab> {
               ),
             ),
 
-            // 2. Sub Tabs (Local, Spaces, Media, Trash)
+            // 2. Sub Tabs (Local, Spaces, Media, Trash) - Active border is black
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
@@ -69,7 +69,7 @@ class _ProjectsTabState extends State<ProjectsTab> {
             const Divider(color: VibeCutColors.textMuted, height: 1),
             const SizedBox(height: 12),
 
-            // 3. Category Filter Chips (All, Video, Photo, Template)
+            // 3. Category Filter Chips (All, Video, Photo, Template, Camera)
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -88,31 +88,31 @@ class _ProjectsTabState extends State<ProjectsTab> {
             // 4. Projects List or Cloud Sync Prompt
             Expanded(
               child: _activeSubTab == 1 
-                  ? _buildCloudSpacesPrompt() // If Spaces selected
-                  : _buildLocalProjectsList(), // Default Local project drafts list
+                  ? _buildCloudSpacesPrompt() 
+                  : _buildLocalProjectsList(), 
             ),
           ],
         ),
 
-        // 5. Floating + Create Action Button (Screenshot 2)
+        // 5. Floating + Create Action Button (Cyan background, black icon/text - matching screenshot 2)
         Positioned(
           bottom: 24,
           right: 24,
           child: FloatingActionButton.extended(
             onPressed: () {},
-            backgroundColor: VibeCutColors.secondary,
-            foregroundColor: VibeCutColors.background,
-            elevation: 8,
+            backgroundColor: VibeCutColors.primary,
+            foregroundColor: Colors.black,
+            elevation: 4,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),
             ),
-            icon: const Icon(Icons.add, size: 24, color: VibeCutColors.background),
+            icon: const Icon(Icons.add, size: 24, color: Colors.black),
             label: Text(
               'Create',
               style: GoogleFonts.outfit(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: VibeCutColors.background,
+                color: Colors.black,
               ),
             ),
           ),
@@ -136,7 +136,7 @@ class _ProjectsTabState extends State<ProjectsTab> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: isActive ? VibeCutColors.secondary : Colors.transparent,
+                color: isActive ? Colors.black : Colors.transparent,
                 width: 2.5,
               ),
             ),
@@ -144,7 +144,7 @@ class _ProjectsTabState extends State<ProjectsTab> {
           child: Text(
             label,
             style: GoogleFonts.outfit(
-              color: isActive ? Colors.white : VibeCutColors.textSecondary,
+              color: isActive ? Colors.black : VibeCutColors.textSecondary,
               fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
               fontSize: 14,
             ),
@@ -166,13 +166,14 @@ class _ProjectsTabState extends State<ProjectsTab> {
         margin: const EdgeInsets.only(right: 10),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? Colors.white : VibeCutColors.surface,
+          color: isActive ? Colors.black : VibeCutColors.surface,
           borderRadius: BorderRadius.circular(8),
+          border: isActive ? null : Border.all(color: VibeCutColors.textMuted.withOpacity(0.5), width: 0.5),
         ),
         child: Text(
           label,
           style: GoogleFonts.outfit(
-            color: isActive ? Colors.black : VibeCutColors.textSecondary,
+            color: isActive ? Colors.white : VibeCutColors.textSecondary,
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
             fontSize: 13,
           ),
@@ -221,7 +222,7 @@ class _ProjectsTabState extends State<ProjectsTab> {
                       style: GoogleFonts.outfit(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: VibeCutColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -272,7 +273,7 @@ class _ProjectsTabState extends State<ProjectsTab> {
               shape: BoxShape.circle,
               color: VibeCutColors.primary.withOpacity(0.1),
             ),
-            child: const Icon(Icons.cloud_upload_outlined, size: 64, color: VibeCutColors.secondary),
+            child: const Icon(Icons.cloud_upload_outlined, size: 64, color: VibeCutColors.primary),
           ),
           const SizedBox(height: 24),
           Text(
@@ -280,7 +281,7 @@ class _ProjectsTabState extends State<ProjectsTab> {
             style: GoogleFonts.outfit(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: VibeCutColors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -302,6 +303,7 @@ class _ProjectsTabState extends State<ProjectsTab> {
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               backgroundColor: VibeCutColors.primary,
+              foregroundColor: Colors.white,
             ),
             child: Text(
               'Sign In',
