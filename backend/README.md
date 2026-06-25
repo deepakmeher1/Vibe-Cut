@@ -1,6 +1,6 @@
-# CapCut Clone Backend (FastAPI)
+# VibeCut Backend (FastAPI)
 
-This is the backend server for the CapCut Clone mobile app, providing user authentication, cloud project sync, asset cataloging (stickers/effects), and video processing.
+This is the backend server for the VibeCut mobile app, providing user authentication, cloud project sync, asset cataloging (stickers/effects), and video processing.
 
 ## Setup Instructions
 

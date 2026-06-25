@@ -1,4 +1,4 @@
-# CapCut Clone App
+# VibeCut App
 
 A cross-platform mobile video editing application built with Flutter (Frontend) and FastAPI (Backend).
 

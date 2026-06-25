@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
-    title="CapCut Clone API",
-    description="Backend services for the CapCut Clone mobile application",
+    title="VibeCut API",
+    description="Backend services for the VibeCut mobile application",
     version="1.0.0"
 )
 

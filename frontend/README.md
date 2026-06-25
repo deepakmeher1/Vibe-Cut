@@ -1,6 +1,6 @@
-# CapCut Clone Frontend (Flutter)
+# VibeCut Frontend (Flutter)
 
-This is the mobile application frontend for the CapCut Clone, built with Flutter for iOS and Android.
+This is the mobile application frontend for the VibeCut app, built with Flutter for iOS and Android.
 
 ## Setup Instructions
 
@@ -10,10 +10,10 @@ This is the mobile application frontend for the CapCut Clone, built with Flutter
 - Git.
 
 ### 1. Initialize the Flutter Project
-Since Flutter SDK was not installed initially on this machine, you can initialize the project structure by navigating to the `E:\Deepak\D project\capcut_clone` directory and running:
+Since Flutter SDK was not installed initially on this machine, you can initialize the project structure by navigating to the `E:\Deepak\D project\vibecut` directory and running:
 
 ```bash
-flutter create --org com.deepak.capcutclone --project-name frontend frontend
+flutter create --org com.deepak.vibecut --project-name frontend frontend
 ```
 
 This will generate the complete native Flutter project structure (including `ios`, `android`, and `lib` folders) directly inside the `frontend/` directory.
