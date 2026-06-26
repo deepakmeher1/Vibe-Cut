@@ -90,7 +90,7 @@ class EditTab extends StatelessWidget {
                 // New Video Button (Cyan Gradient)
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () => Navigator.pushNamed(context, '/editor'),
                     child: Container(
                       height: 120,
                       decoration: BoxDecoration(

@@ -99,7 +99,7 @@ class _ProjectsTabState extends State<ProjectsTab> {
           bottom: 24,
           right: 24,
           child: FloatingActionButton.extended(
-            onPressed: () {},
+            onPressed: () => Navigator.pushNamed(context, '/editor'),
             backgroundColor: VibeCutColors.primary,
             foregroundColor: Colors.black,
             elevation: 4,

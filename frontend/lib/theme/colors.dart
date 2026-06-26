@@ -1,4 +1,3 @@
-import 'package:flutter/color_撥/material.dart'; // Wait, let's use standard import
 import 'package:flutter/material.dart';
 
 class VibeCutColors {
