@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/colors.dart';
+import '../services/api_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -19,28 +20,48 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
 
-  void _handleSignup() {
+  void _handleSignup() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
-      // Simulate API verification call
-      Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          _isLoading = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account created successfully! Please log in.'),
-            backgroundColor: VibeCutColors.success,
-          ),
+      try {
+        await ApiService().register(
+          _emailController.text.trim(),
+          _passwordController.text,
+          name: _nameController.text.trim(),
         );
 
-        // Redirect to Login page
-        Navigator.pushReplacementNamed(context, '/login');
-      });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Account created successfully! Please log in.'),
+              backgroundColor: VibeCutColors.success,
+            ),
+          );
+
+          // Redirect to Login page
+          Navigator.pushReplacementNamed(context, '/login');
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Registration failed: ${e.toString().replaceAll('Exception: ', '').replaceAll('Exception:', '')}'),
+              backgroundColor: VibeCutColors.error,
+            ),
+          );
+        }
+      }
     }
   }
 

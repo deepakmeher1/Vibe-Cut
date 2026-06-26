@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/colors.dart';
+import '../../services/api_service.dart';
 
 class ProjectsTab extends StatefulWidget {
   const ProjectsTab({super.key});
@@ -12,6 +13,34 @@ class ProjectsTab extends StatefulWidget {
 class _ProjectsTabState extends State<ProjectsTab> {
   int _activeSubTab = 0; // 0 = Local, 1 = Spaces, 2 = Media, 3 = Trash
   int _activeFilterIndex = 0; // 0 = All, 1 = Video, 2 = Photo
+  
+  List<dynamic> _backendProjects = [];
+  bool _loadingProjects = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBackendProjects();
+  }
+
+  Future<void> _loadBackendProjects() async {
+    if (!ApiService().isAuthenticated) return;
+    setState(() {
+      _loadingProjects = true;
+    });
+    try {
+      final list = await ApiService().getProjects();
+      setState(() {
+        _backendProjects = list;
+      });
+    } catch (e) {
+      // Quietly fail or log
+    } finally {
+      setState(() {
+        _loadingProjects = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +71,7 @@ class _ProjectsTabState extends State<ProjectsTab> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.sort_rounded, color: VibeCutColors.textPrimary),
-                        onPressed: () {},
+                        onPressed: _loadBackendProjects, // Pull to refresh
                       ),
                       IconButton(
                         icon: const Icon(Icons.more_horiz, color: VibeCutColors.textPrimary),
@@ -99,7 +128,10 @@ class _ProjectsTabState extends State<ProjectsTab> {
           bottom: 24,
           right: 24,
           child: FloatingActionButton.extended(
-            onPressed: () => Navigator.pushNamed(context, '/editor'),
+            onPressed: () async {
+              await Navigator.pushNamed(context, '/editor');
+              _loadBackendProjects();
+            },
             backgroundColor: VibeCutColors.primary,
             foregroundColor: Colors.black,
             elevation: 4,
@@ -183,78 +215,124 @@ class _ProjectsTabState extends State<ProjectsTab> {
   }
 
   Widget _buildLocalProjectsList() {
-    final projects = [
-      {'name': '0623', 'date': '06/23/2026 11:47', 'time': '00:07', 'size': '41MB', 'img': 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=150'},
-      {'name': '0619', 'date': '06/23/2026 11:31', 'time': '00:09', 'size': '155MB', 'img': 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=150'},
-      {'name': 'Yoga', 'date': '06/22/2026 16:10', 'time': '00:19', 'size': '45MB', 'img': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=150'},
-    ];
+    if (_loadingProjects) {
+      return const Center(child: CircularProgressIndicator(color: VibeCutColors.primary));
+    }
+
+    final projects = ApiService().isAuthenticated && _backendProjects.isNotEmpty
+        ? _backendProjects
+        : [
+            {'id': -1, 'name': 'Beach Waves Draft', 'duration': '00:12', 'size': '41MB', 'thumbnail': 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=150', 'created_at': '2026-06-23T11:47:00Z'},
+            {'id': -2, 'name': 'Dance Segment', 'duration': '00:10', 'size': '155MB', 'thumbnail': 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=150', 'created_at': '2026-06-23T11:31:00Z'},
+            {'id': -3, 'name': 'Yoga Session', 'duration': '00:19', 'size': '45MB', 'thumbnail': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=150', 'created_at': '2026-06-22T16:10:00Z'},
+          ];
 
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 80),
       itemCount: projects.length,
       itemBuilder: (context, index) {
         final proj = projects[index];
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: VibeCutColors.surface,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  proj['img']!,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
+        final projId = proj['id'] as int;
+        final thumbnail = proj['thumbnail'] ?? 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=150';
+
+        return InkWell(
+          onTap: () async {
+            if (projId >= 0) {
+              await Navigator.pushNamed(context, '/editor', arguments: projId);
+              _loadBackendProjects();
+            } else {
+              Navigator.pushNamed(context, '/editor');
+            }
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: VibeCutColors.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    thumbnail,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      proj['name']!,
-                      style: GoogleFonts.outfit(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: VibeCutColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      proj['date']!,
-                      style: GoogleFonts.outfit(
-                        fontSize: 13,
-                        color: VibeCutColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        const Icon(Icons.timer_outlined, size: 14, color: VibeCutColors.textSecondary),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${proj['time']} | ${proj['size']}',
-                          style: GoogleFonts.outfit(
-                            fontSize: 12,
-                            color: VibeCutColors.textSecondary,
-                          ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        proj['name']!,
+                        style: GoogleFonts.outfit(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: VibeCutColors.textPrimary,
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        proj['created_at'] != null 
+                            ? proj['created_at'].toString().substring(0, 10) 
+                            : 'Recent Draft',
+                        style: GoogleFonts.outfit(
+                          fontSize: 13,
+                          color: VibeCutColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Icon(Icons.timer_outlined, size: 14, color: VibeCutColors.textSecondary),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${proj['duration']} | ${proj['size']}',
+                            style: GoogleFonts.outfit(
+                              fontSize: 12,
+                              color: VibeCutColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.more_vert, color: VibeCutColors.textSecondary),
-                onPressed: () {},
-              ),
-            ],
+                if (projId >= 0)
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: VibeCutColors.textSecondary),
+                    onSelected: (value) async {
+                      if (value == 'delete') {
+                        try {
+                          await ApiService().deleteProject(projId);
+                          _loadBackendProjects();
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Project deleted'), backgroundColor: VibeCutColors.success),
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed to delete: $e'), backgroundColor: VibeCutColors.error),
+                            );
+                          }
+                        }
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Text('Delete', style: TextStyle(color: VibeCutColors.error)),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ),
         );
       },

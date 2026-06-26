@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/colors.dart';
+import '../services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,28 +17,47 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
 
-  void _handleLogin() {
+  void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
       
-      // Simulate API verification call
-      Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          _isLoading = false;
-        });
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Logged in successfully!'),
-            backgroundColor: VibeCutColors.success,
-          ),
+      try {
+        await ApiService().login(
+          _emailController.text.trim(),
+          _passwordController.text,
         );
         
-        // Redirect to VibeCut Home Dashboard
-        Navigator.pushReplacementNamed(context, '/home');
-      });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Logged in successfully!'),
+              backgroundColor: VibeCutColors.success,
+            ),
+          );
+          
+          // Redirect to VibeCut Home Dashboard
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Login failed: ${e.toString().replaceAll('Exception: ', '').replaceAll('Exception:', '')}'),
+              backgroundColor: VibeCutColors.error,
+            ),
+          );
+        }
+      }
     }
   }
 

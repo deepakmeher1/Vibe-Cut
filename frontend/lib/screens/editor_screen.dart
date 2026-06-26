@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../theme/colors.dart';
 import '../widgets/video_player_widget.dart';
 import '../widgets/timeline_widget.dart';
 import '../widgets/media_picker_dialog.dart';
+import '../providers/editor_provider.dart';
 
 class EditorScreen extends StatefulWidget {
   const EditorScreen({super.key});
@@ -13,8 +15,19 @@ class EditorScreen extends StatefulWidget {
 }
 
 class _EditorScreenState extends State<EditorScreen> {
-  Map<String, String>? _selectedMedia;
-  String _aspectRatioLabel = "16:9";
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      final provider = Provider.of<EditorProvider>(context, listen: false);
+      if (args is int) {
+        provider.loadProject(args);
+      } else {
+        provider.initNewProject("Project_${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}");
+      }
+    });
+  }
 
   void _handleMediaPicker() async {
     final selected = await showDialog<Map<String, String>>(
@@ -22,14 +35,15 @@ class _EditorScreenState extends State<EditorScreen> {
       builder: (context) => const MediaPickerDialog(),
     );
     if (selected != null) {
-      setState(() {
-        _selectedMedia = selected;
-      });
+      if (mounted) {
+        Provider.of<EditorProvider>(context, listen: false).importVideo(selected);
+      }
     }
   }
 
-  void _handleExport() {
-    if (_selectedMedia == null) {
+  void _handleExport() async {
+    final provider = Provider.of<EditorProvider>(context, listen: false);
+    if (provider.videoClips.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please import a video first before exporting.'),
@@ -38,7 +52,24 @@ class _EditorScreenState extends State<EditorScreen> {
       );
       return;
     }
-    
+
+    // Save project state to backend first
+    try {
+      await provider.saveProject();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save project to server: $e'),
+            backgroundColor: VibeCutColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (!mounted) return;
+
     // Simulate Video export
     showDialog(
       context: context,
@@ -71,18 +102,22 @@ class _EditorScreenState extends State<EditorScreen> {
     );
 
     Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pop(context); // Close loading dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Video exported successfully to your gallery!'),
-          backgroundColor: VibeCutColors.success,
-        ),
-      );
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Video exported and synced with backend successfully!'),
+            backgroundColor: VibeCutColors.success,
+          ),
+        );
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final editorState = Provider.of<EditorProvider>(context);
+
     return Scaffold(
       backgroundColor: VibeCutColors.background,
       appBar: AppBar(
@@ -90,13 +125,32 @@ class _EditorScreenState extends State<EditorScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: VibeCutColors.textPrimary, size: 20),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            // Save state when exiting if has clips
+            if (editorState.videoClips.isNotEmpty) {
+              editorState.saveProject().catchError((e) {
+                // Ignore background save errors on exit
+              });
+            }
+            Navigator.pop(context);
+          },
         ),
         title: Text(
-          _selectedMedia?['name'] ?? 'New Project',
+          editorState.projectName,
           style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
+          if (editorState.isLoading)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: VibeCutColors.primary),
+                ),
+              ),
+            ),
           // Export Button (Cyan primary gradient)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
@@ -117,101 +171,132 @@ class _EditorScreenState extends State<EditorScreen> {
           ),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // 1. Video Player preview panel
-          VideoPlayerWidget(selectedMedia: _selectedMedia),
-          
-          // 2. Toolbar controls (Undo, Redo, Ratio)
-          Container(
-            color: VibeCutColors.surface,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: editorState.isLoading && editorState.videoClips.isEmpty
+          ? const Center(child: CircularProgressIndicator(color: VibeCutColors.primary))
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.undo, size: 20, color: VibeCutColors.textPrimary),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.redo, size: 20, color: VibeCutColors.textPrimary),
-                      onPressed: () {},
-                    ),
-                  ],
+                // 1. Video Player preview panel
+                const VideoPlayerWidget(),
+                
+                // 2. Toolbar controls (Undo, Redo, Ratio)
+                Container(
+                  color: VibeCutColors.surface,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.undo, size: 20, color: VibeCutColors.textPrimary),
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Undo action'), duration: Duration(milliseconds: 500)),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.redo, size: 20, color: VibeCutColors.textPrimary),
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Redo action'), duration: Duration(milliseconds: 500)),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      
+                      // Aspect Ratio Selector
+                      GestureDetector(
+                        onTap: () {
+                          final current = editorState.aspectRatioLabel;
+                          final next = current == "16:9" 
+                              ? "9:16" 
+                              : current == "9:16" 
+                                  ? "1:1" 
+                                  : "16:9";
+                          editorState.updateAspectRatio(next);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: VibeCutColors.textMuted, width: 1),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.aspect_ratio_outlined, size: 14, color: VibeCutColors.textPrimary),
+                              const SizedBox(width: 6),
+                              Text(
+                                editorState.aspectRatioLabel,
+                                style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold, color: VibeCutColors.textPrimary),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 
-                // Aspect Ratio Selector
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _aspectRatioLabel = _aspectRatioLabel == "16:9" 
-                          ? "9:16" 
-                          : _aspectRatioLabel == "9:16" 
-                              ? "1:1" 
-                              : "16:9";
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: VibeCutColors.textMuted, width: 1),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.aspect_ratio_outlined, size: 14, color: VibeCutColors.textPrimary),
-                        const SizedBox(width: 6),
-                        Text(
-                          _aspectRatioLabel,
-                          style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold, color: VibeCutColors.textPrimary),
-                        ),
-                      ],
-                    ),
+                // 3. Timeline tracks view
+                Expanded(
+                  child: TimelineWidget(onImportMedia: _handleMediaPicker),
+                ),
+                
+                // 4. Bottom Main Editing Tools Shelf
+                Container(
+                  height: 72,
+                  color: VibeCutColors.background,
+                  border: const Border(top: BorderSide(color: VibeCutColors.textMuted, width: 0.5)),
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    children: [
+                      _buildToolOption(Icons.cut_outlined, 'Split', onTap: () {
+                        if (editorState.videoClips.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please import a video first.'), backgroundColor: VibeCutColors.error),
+                          );
+                          return;
+                        }
+                        editorState.splitClip();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Video split successfully!'), backgroundColor: VibeCutColors.success),
+                        );
+                      }),
+                      _buildToolOption(Icons.music_note_outlined, 'Audio', onTap: () async {
+                        final selected = await showDialog<Map<String, String>>(
+                          context: context,
+                          builder: (context) => const MediaPickerDialog(),
+                        );
+                        if (selected != null) {
+                          editorState.addAudio(selected);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Audio track added!'), backgroundColor: VibeCutColors.success),
+                            );
+                          }
+                        }
+                      }),
+                      _buildToolOption(Icons.title_outlined, 'Text', onTap: () {
+                        editorState.addText("Text Layer ${editorState.textClips.length + 1}");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Text overlay added!'), backgroundColor: VibeCutColors.success),
+                        );
+                      }),
+                      _buildToolOption(Icons.filter_hdr_outlined, 'Filters'),
+                      _buildToolOption(Icons.star_outline_rounded, 'Effects'),
+                      _buildToolOption(Icons.photo_size_select_large_outlined, 'Canvas'),
+                      _buildToolOption(Icons.speed_outlined, 'Speed'),
+                      _buildToolOption(Icons.photo_filter_outlined, 'Overlays'),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-          
-          // 3. Timeline tracks view
-          Expanded(
-            child: TimelineWidget(
-              selectedMedia: _selectedMedia,
-              onImportMedia: _handleMediaPicker,
-            ),
-          ),
-          
-          // 4. Bottom Main Editing Tools Shelf
-          Container(
-            height: 72,
-            color: VibeCutColors.background,
-            border: const Border(top: BorderSide(color: VibeCutColors.textMuted, width: 0.5)),
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              children: [
-                _buildToolOption(Icons.cut_outlined, 'Split', onTap: () {
-                  if (_selectedMedia == null) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Video split successfully!'), backgroundColor: VibeCutColors.success),
-                  );
-                }),
-                _buildToolOption(Icons.music_note_outlined, 'Audio'),
-                _buildToolOption(Icons.title_outlined, 'Text'),
-                _buildToolOption(Icons.filter_hdr_outlined, 'Filters'),
-                _buildToolOption(Icons.star_outline_rounded, 'Effects'),
-                _buildToolOption(Icons.photo_size_select_large_outlined, 'Canvas'),
-                _buildToolOption(Icons.speed_outlined, 'Speed'),
-                _buildToolOption(Icons.photo_filter_outlined, 'Overlays'),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 

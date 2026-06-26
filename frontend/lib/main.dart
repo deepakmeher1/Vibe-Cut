@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'theme/colors.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/main_layout.dart';
 import 'screens/editor_screen.dart';
+import 'providers/editor_provider.dart';
 
 void main() {
-  runApp(const VibeCutApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => EditorProvider()),
+      ],
+      child: const VibeCutApp(),
+    ),
+  );
 }
 
 class VibeCutApp extends StatelessWidget {

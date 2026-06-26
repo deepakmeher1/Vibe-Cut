@@ -1,33 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../theme/colors.dart';
+import '../providers/editor_provider.dart';
 
-class VideoPlayerWidget extends StatefulWidget {
-  final Map<String, String>? selectedMedia;
+class VideoPlayerWidget extends StatelessWidget {
+  const VideoPlayerWidget({super.key});
 
-  const VideoPlayerWidget({
-    super.key,
-    required this.selectedMedia,
-  });
-
-  @override
-  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
-}
-
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  bool _isPlaying = false;
-  double _currentProgress = 0.2; // Mock progress (20% through video)
+  String _formatMs(int ms) {
+    final int totalSeconds = ms ~/ 1000;
+    final int minutes = totalSeconds ~/ 60;
+    final int seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
 
   @override
   Widget build(BuildContext context) {
-    final hasMedia = widget.selectedMedia != null;
-    final mediaImg = widget.selectedMedia?['img'] ?? 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=600'; // Fallback backdrop
-    final mediaDuration = widget.selectedMedia?['duration'] ?? '00:15';
+    final editorState = Provider.of<EditorProvider>(context);
+
+    final hasMedia = editorState.videoClips.isNotEmpty;
+    // Get thumbnail of the first video clip
+    final mediaImg = hasMedia 
+        ? editorState.videoClips.first['img'] ?? 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=600'
+        : 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=600';
+    
+    final durationStr = _formatMs(editorState.totalDurationMs);
+    final elapsedStr = _formatMs(editorState.playheadMs);
 
     return Container(
       color: Colors.black, // Active video frames are always framed in pure black
       child: AspectRatio(
-        aspectRatio: 16 / 9,
+        aspectRatio: editorState.aspectRatioLabel == "16:9" 
+            ? 16 / 9 
+            : editorState.aspectRatioLabel == "9:16" 
+                ? 9 / 16 
+                : 1 / 1,
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -71,9 +78,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () {
-                      setState(() {
-                        _isPlaying = !_isPlaying;
-                      });
+                      editorState.togglePlay();
                     },
                     child: Center(
                       child: Container(
@@ -83,7 +88,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                           color: Colors.black.withOpacity(0.5),
                         ),
                         child: Icon(
-                          _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                          editorState.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                           size: 40,
                           color: Colors.white,
                         ),
@@ -112,7 +117,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                     children: [
                       // Active Timestamp
                       Text(
-                        '00:03',
+                        elapsedStr,
                         style: GoogleFonts.outfit(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                       
@@ -128,11 +133,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                             overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
                           ),
                           child: Slider(
-                            value: _currentProgress,
+                            value: editorState.playheadProgress,
                             onChanged: (value) {
-                              setState(() {
-                                _currentProgress = value;
-                              });
+                              editorState.seekProgress(value);
                             },
                           ),
                         ),
@@ -140,7 +143,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                       
                       // Ending Timestamp
                       Text(
-                        mediaDuration,
+                        durationStr,
                         style: GoogleFonts.outfit(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                     ],

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/colors.dart';
+import '../../services/api_service.dart';
 
-class EditTab extends StatelessWidget {
+class EditTab extends StatefulWidget {
   final VoidCallback onOpenAllTools;
   final Function(int) onChangeTab;
 
@@ -13,13 +14,56 @@ class EditTab extends StatelessWidget {
   });
 
   @override
+  State<EditTab> createState() => _EditTabState();
+}
+
+class _EditTabState extends State<EditTab> {
+  List<dynamic> _recentProjects = [];
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecentProjects();
+  }
+
+  Future<void> _loadRecentProjects() async {
+    if (!ApiService().isAuthenticated) return;
+    setState(() {
+      _loading = true;
+    });
+    try {
+      final list = await ApiService().getProjects();
+      // Keep only first 3 items
+      setState(() {
+        _recentProjects = list.take(3).toList();
+      });
+    } catch (e) {
+      // Quietly fail
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final hasBackendProjects = ApiService().isAuthenticated && _recentProjects.isNotEmpty;
+    final displayProjects = hasBackendProjects
+        ? _recentProjects
+        : [
+            {'id': -1, 'name': 'Beach Waves Draft', 'duration': '00:12', 'size': '41MB', 'thumbnail': 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=150', 'created_at': '2026-06-23T11:47:00Z'},
+            {'id': -2, 'name': 'Dance Segment', 'duration': '00:10', 'size': '155MB', 'thumbnail': 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=150', 'created_at': '2026-06-23T11:31:00Z'},
+            {'id': -3, 'name': 'Yoga Session', 'duration': '00:19', 'size': '45MB', 'thumbnail': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=150', 'created_at': '2026-06-22T16:10:00Z'},
+          ];
+
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Promotional Header Banner (Image overlay, text remains white for contrast)
+          // 1. Promotional Header Banner
           Container(
             height: 220,
             width: double.infinity,
@@ -87,10 +131,12 @@ class EditTab extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
             child: Row(
               children: [
-                // New Video Button (Cyan Gradient)
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, '/editor'),
+                    onTap: () async {
+                      await Navigator.pushNamed(context, '/editor');
+                      _loadRecentProjects();
+                    },
                     child: Container(
                       height: 120,
                       decoration: BoxDecoration(
@@ -124,7 +170,6 @@ class EditTab extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
                 
-                // Edit Photo Button (Card surface / White background)
                 Expanded(
                   child: GestureDetector(
                     onTap: () {},
@@ -156,7 +201,7 @@ class EditTab extends StatelessWidget {
             ),
           ),
 
-          // 3. Quick Action Grid (White background / light gray containers)
+          // 3. Quick Action Grid
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Container(
@@ -184,7 +229,7 @@ class EditTab extends StatelessWidget {
                     Icons.grid_view_rounded, 
                     'All tools', 
                     color: VibeCutColors.primary,
-                    onTap: onOpenAllTools
+                    onTap: widget.onOpenAllTools
                   ),
                 ],
               ),
@@ -207,7 +252,7 @@ class EditTab extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    onChangeTab(2); // Switch to Projects Tab
+                    widget.onChangeTab(2); // Switch to Projects Tab
                   },
                   child: Text(
                     'View all',
@@ -221,88 +266,97 @@ class EditTab extends StatelessWidget {
             ),
           ),
           
-          // Projects List (Light Mode list items)
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 3,
-            itemBuilder: (context, index) {
-              final projects = [
-                {'name': '0623', 'date': '06/23/2026 11:47', 'time': '00:07', 'size': '41MB', 'img': 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=150'},
-                {'name': '0619', 'date': '06/23/2026 11:31', 'time': '00:09', 'size': '155MB', 'img': 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=150'},
-                {'name': 'Yoga', 'date': '06/22/2026 16:10', 'time': '00:19', 'size': '45MB', 'img': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=150'},
-              ];
-              final proj = projects[index];
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: VibeCutColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    // Project Thumbnail
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        proj['img']!,
-                        width: 70,
-                        height: 70,
-                        fit: BoxFit.cover,
+          // Projects List
+          _loading
+              ? const Center(child: CircularProgressIndicator(color: VibeCutColors.primary))
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: displayProjects.length,
+                  itemBuilder: (context, index) {
+                    final proj = displayProjects[index];
+                    final projId = proj['id'] as int;
+                    final thumbnail = proj['thumbnail'] ?? proj['img'] ?? 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=150';
+
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: VibeCutColors.surface,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ),
-                    const SizedBox(width: 14),
-                    
-                    // Project info
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            proj['name']!,
-                            style: GoogleFonts.outfit(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: VibeCutColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            proj['date']!,
-                            style: GoogleFonts.outfit(
-                              fontSize: 12,
-                              color: VibeCutColors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(Icons.movie_filter_outlined, size: 12, color: VibeCutColors.textSecondary.withOpacity(0.7)),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${proj['time']} | ${proj['size']}',
-                                style: GoogleFonts.outfit(
-                                  fontSize: 11,
-                                  color: VibeCutColors.textSecondary.withOpacity(0.7),
-                                ),
+                      child: InkWell(
+                        onTap: () async {
+                          if (projId >= 0) {
+                            await Navigator.pushNamed(context, '/editor', arguments: projId);
+                            _loadRecentProjects();
+                          } else {
+                            Navigator.pushNamed(context, '/editor');
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                thumbnail,
+                                width: 70,
+                                height: 70,
+                                fit: BoxFit.cover,
                               ),
-                            ],
-                          ),
-                        ],
+                            ),
+                            const SizedBox(width: 14),
+                            
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    proj['name']!,
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: VibeCutColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    proj['created_at'] != null 
+                                        ? proj['created_at'].toString().substring(0, 10) 
+                                        : proj['date'] ?? 'Recent',
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 12,
+                                      color: VibeCutColors.textSecondary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.movie_filter_outlined, size: 12, color: VibeCutColors.textSecondary.withOpacity(0.7)),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${proj['duration'] ?? proj['time']} | ${proj['size']}',
+                                        style: GoogleFonts.outfit(
+                                          fontSize: 11,
+                                          color: VibeCutColors.textSecondary.withOpacity(0.7),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            IconButton(
+                              icon: const Icon(Icons.more_vert, color: VibeCutColors.textSecondary),
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    
-                    // Options button
-                    IconButton(
-                      icon: const Icon(Icons.more_vert, color: VibeCutColors.textSecondary),
-                      onPressed: () {},
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ],
       ),
     );
