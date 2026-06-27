@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.endpoints import auth, projects
+from app.api.endpoints import auth, projects, templates
 from app.database import engine, Base
 
 # Create SQLite tables on startup
@@ -25,6 +25,7 @@ app.add_middleware(
 # Register API Routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(projects.router, prefix=f"{settings.API_V1_STR}/projects", tags=["projects"])
+app.include_router(templates.router, prefix=f"{settings.API_V1_STR}/templates", tags=["templates"])
 
 @app.get("/")
 async def root():

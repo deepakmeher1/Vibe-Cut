@@ -71,6 +71,19 @@ class ApiService {
     _token = null;
   }
 
+  // Templates API
+  Future<List<dynamic>> getTemplates({String? category, String? query}) async {
+    try {
+      final response = await _dio.get('/templates/', queryParameters: {
+        if (category != null && category.isNotEmpty) 'category': category,
+        if (query != null && query.isNotEmpty) 'query': query,
+      });
+      return response.data;
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   // Projects API
   Future<List<dynamic>> getProjects() async {
     try {

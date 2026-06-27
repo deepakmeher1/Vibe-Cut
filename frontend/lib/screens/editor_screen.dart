@@ -23,6 +23,8 @@ class _EditorScreenState extends State<EditorScreen> {
       final provider = Provider.of<EditorProvider>(context, listen: false);
       if (args is int) {
         provider.loadProject(args);
+      } else if (args is Map<String, dynamic>) {
+        provider.loadTemplate(args);
       } else {
         provider.initNewProject("Project_${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}");
       }

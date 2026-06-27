@@ -1,9 +1,63 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/colors.dart';
+import '../../services/api_service.dart';
 
-class TemplatesTab extends StatelessWidget {
+class TemplatesTab extends StatefulWidget {
   const TemplatesTab({super.key});
+
+  @override
+  State<TemplatesTab> createState() => _TemplatesTabState();
+}
+
+class _TemplatesTabState extends State<TemplatesTab> {
+  List<dynamic> _templates = [];
+  bool _loading = false;
+  String _activeCategory = 'All';
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTemplates();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _fetchTemplates() async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      final list = await ApiService().getTemplates(
+        category: _activeCategory,
+        query: _searchController.text.trim(),
+      );
+      setState(() {
+        _templates = list;
+      });
+    } catch (e) {
+      // Quiet fail
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+
+  void _onSearchChanged(String val) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _fetchTemplates();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +76,8 @@ class TemplatesTab extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextField(
+                    controller: _searchController,
+                    onChanged: _onSearchChanged,
                     style: GoogleFonts.outfit(color: VibeCutColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: 'Search templates, creators...',
@@ -51,16 +107,16 @@ class TemplatesTab extends StatelessWidget {
           ),
         ),
 
-        // 2. Sub-Category Tabs (All, AI effects)
+        // 2. Sub-Category Tabs (All, AI effects, Cinematic)
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
             children: [
-              _buildCategoryChip('All', isActive: true),
+              _buildCategoryChip('All'),
               const SizedBox(width: 12),
-              _buildCategoryChip('AI effects', isActive: false),
+              _buildCategoryChip('AI effects'),
               const SizedBox(width: 12),
-              _buildCategoryChip('Cinematic', isActive: false),
+              _buildCategoryChip('Cinematic'),
             ],
           ),
         ),
@@ -68,81 +124,77 @@ class TemplatesTab extends StatelessWidget {
 
         // 3. Grid List of templates
         Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 0.65,
-            ),
-            itemCount: 4,
-            itemBuilder: (context, index) {
-              final templates = [
-                {
-                  'title': 'Cinematic Video',
-                  'author': 'GentleGiant Saint',
-                  'views': '40.4K',
-                  'isAi': true,
-                  'img': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=300'
-                },
-                {
-                  'title': 'Sunset template',
-                  'author': 'Mr. John',
-                  'views': '1.3K',
-                  'isAi': true,
-                  'img': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=300'
-                },
-                {
-                  'title': 'Retro Movie recap',
-                  'author': 'Alex Media',
-                  'views': '98.1K',
-                  'isAi': false,
-                  'img': 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=300'
-                },
-                {
-                  'title': 'Cyberpunk Beats',
-                  'author': 'VibeFX',
-                  'views': '12.5K',
-                  'isAi': true,
-                  'img': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=300'
-                },
-              ];
-              
-              final tmpl = templates[index];
-              return _buildTemplateCard(
-                tmpl['title'] as String,
-                tmpl['author'] as String,
-                tmpl['views'] as String,
-                tmpl['img'] as String,
-                tmpl['isAi'] as bool,
-              );
-            },
-          ),
+          child: _loading
+              ? const Center(child: CircularProgressIndicator(color: VibeCutColors.primary))
+              : _templates.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No templates found',
+                        style: GoogleFonts.outfit(color: VibeCutColors.textSecondary, fontSize: 15),
+                      ),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        childAspectRatio: 0.65,
+                      ),
+                      itemCount: _templates.length,
+                      itemBuilder: (context, index) {
+                        final tmpl = _templates[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context, 
+                              '/editor', 
+                              arguments: Map<String, dynamic>.from(tmpl),
+                            );
+                          },
+                          child: _buildTemplateCard(tmpl),
+                        );
+                      },
+                    ),
         ),
       ],
     );
   }
 
-  Widget _buildCategoryChip(String label, {required bool isActive}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isActive ? VibeCutColors.primary : VibeCutColors.surface,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.outfit(
-          color: isActive ? Colors.white : VibeCutColors.textSecondary,
-          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-          fontSize: 14,
+  Widget _buildCategoryChip(String label) {
+    final isActive = _activeCategory == label;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _activeCategory = label;
+        });
+        _fetchTemplates();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? VibeCutColors.primary : VibeCutColors.surface,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.outfit(
+            color: isActive ? Colors.white : VibeCutColors.textSecondary,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            fontSize: 14,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTemplateCard(String title, String author, String views, String imgUrl, bool isAi) {
+  Widget _buildTemplateCard(Map<String, dynamic> tmpl) {
+    final title = tmpl['title'] as String? ?? 'Template';
+    final author = tmpl['author'] as String? ?? 'Creator';
+    final views = tmpl['views'] as String? ?? '0';
+    final imgUrl = tmpl['thumbnail_url'] as String? ?? 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=300';
+    final isAi = tmpl['is_ai'] as bool? ?? false;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -210,7 +262,7 @@ class TemplatesTab extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        // Template details
+        // Template title
         Text(
           title,
           maxLines: 1,
@@ -230,7 +282,7 @@ class TemplatesTab extends StatelessWidget {
               radius: 8,
               backgroundColor: VibeCutColors.primary.withOpacity(0.2),
               child: Text(
-                author[0], 
+                author.isNotEmpty ? author[0].toUpperCase() : 'C', 
                 style: const TextStyle(fontSize: 8, color: VibeCutColors.primary),
               ),
             ),

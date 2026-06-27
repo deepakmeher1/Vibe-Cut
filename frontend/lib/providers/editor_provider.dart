@@ -292,6 +292,38 @@ class EditorProvider extends ChangeNotifier {
     }
   }
 
+  void loadTemplate(Map<String, dynamic> template) {
+    _projectId = null;
+    _projectName = "${template['title'] ?? 'Template'} Edit";
+    _projectDuration = template['duration'] ?? '00:15';
+    _projectSize = template['size'] ?? '0 MB';
+    _thumbnail = template['thumbnail_url'];
+    _playheadMs = 0;
+
+    final timelineStr = template['timeline_data'] as String?;
+    if (timelineStr != null && timelineStr.isNotEmpty) {
+      final timelineMap = jsonDecode(timelineStr) as Map<String, dynamic>;
+      _aspectRatioLabel = timelineMap['aspectRatio'] ?? '16:9';
+      _totalDurationMs = timelineMap['totalDurationMs'] ?? 15000;
+      
+      _videoClips = List<Map<String, dynamic>>.from(
+        (timelineMap['videoClips'] as List? ?? []).map((x) => Map<String, dynamic>.from(x))
+      );
+      _audioClips = List<Map<String, dynamic>>.from(
+        (timelineMap['audioClips'] as List? ?? []).map((x) => Map<String, dynamic>.from(x))
+      );
+      _textClips = List<Map<String, dynamic>>.from(
+        (timelineMap['textClips'] as List? ?? []).map((x) => Map<String, dynamic>.from(x))
+      );
+    } else {
+      _videoClips = [];
+      _audioClips = [];
+      _textClips = [];
+      _totalDurationMs = 15000;
+    }
+    notifyListeners();
+  }
+
   void initNewProject(String name) {
     _projectId = null;
     _projectName = name;
