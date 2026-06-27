@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vibecut_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/workspace
+      - /workspace/.venv
+    environment:
+      - API_V1_STR=/api/v1
+      - PROJECT_NAME=VibeCut
+      - DATABASE_URL=sqlite:////workspace/vibecut.db
+    restart: always
